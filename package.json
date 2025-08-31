@@ -4,7 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "node --env-file=.env index.js",
+    "build": "node index.js",
     "dev": "nodemon --env-file=.env index.js"
   },
   "keywords": [],
