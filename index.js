@@ -52,7 +52,7 @@ const start = async () => {
 
         await Category.bulkCreate(Category_Default, { ignoreDuplicates: true })
 
-        server.listen(PORT, () => {
+        app.listen(PORT, () => {
             console.log(`Server started on port ${PORT}`)
         })
 
