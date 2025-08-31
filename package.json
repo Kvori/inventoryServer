@@ -4,6 +4,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "build": "node index.js",
     "dev": "nodemon --env-file=.env ./api/index.js"
   },
   "keywords": [],
