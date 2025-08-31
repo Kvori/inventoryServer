@@ -115,8 +115,8 @@ class UserController {
             res.clearCookie('connect.sid', {
                 path: '/',
                 httpOnly: true,
-                sameSite: 'lax',
-                secure: false
+                sameSite: 'none',
+                secure: true
             })
             res.json({ message: 'Выход из системы прошел успешно' })
         })
