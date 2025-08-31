@@ -5,8 +5,6 @@ import router from './routes/index.js'
 import ErrorHandler from './middleware/errorHandlingMiddleware.js'
 import session from 'express-session'
 import SequelizeStore from 'connect-session-sequelize'
-import initSocket from './ws/index.js'
-import http from 'http'
 import { Category } from './models/models.js'
 import { Category_Default } from './consts.js'
 
@@ -53,10 +51,6 @@ const start = async () => {
         await store.sync()
 
         await Category.bulkCreate(Category_Default, { ignoreDuplicates: true })
-
-        const server = http.createServer(app)
-
-        initSocket(server)
 
         server.listen(PORT, () => {
             console.log(`Server started on port ${PORT}`)
