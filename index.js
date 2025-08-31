@@ -33,7 +33,11 @@ app.use(session({
         secure: true
     }
 }))
+
+const cleanOrigin = process.env.CLIENT_URL?.replace(/^['"]|['"]$/g, '').replace(/\/$/, '')
+
 app.use(cors({
+    origin: cleanOrigin,
     credentials: true
 }))
 app.use(express.json())
