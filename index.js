@@ -1,14 +1,14 @@
 import express from 'express'
 import cors from 'cors'
-import sequelize from '../db.js'
-import router from '../routes/index.js'
-import ErrorHandler from '../middleware/errorHandlingMiddleware.js'
+import sequelize from './db.js'
+import router from './routes/index.js'
+import ErrorHandler from './middleware/errorHandlingMiddleware.js'
 import session from 'express-session'
 import SequelizeStore from 'connect-session-sequelize'
-import { Category } from '../models/models.js'
-import { Category_Default } from '../consts.js'
-import serverless from 'serverless-http'
+import { Category } from './models/models.js'
+import { Category_Default } from './consts.js'
 
+const PORT = process.env.PORT || 5000
 const app = express()
 
 const SessionStore = SequelizeStore(session.Store)
@@ -41,11 +41,25 @@ app.use(cors({
 }))
 app.use(express.json())
 app.use('/api', router)
+
 app.use(ErrorHandler)
 
-await sequelize.authenticate()
-await sequelize.sync({ alter: true })
-await store.sync()
-await Category.bulkCreate(Category_Default, { ignoreDuplicates: true })
+const start = async () => {
+    try {
+        await sequelize.authenticate()
+        await sequelize.sync({ alter: true })
+        await store.sync()
 
-export default serverless(app)
+        await Category.bulkCreate(Category_Default, { ignoreDuplicates: true })
+
+        app.listen(PORT, () => {
+            console.log(`Server started on port ${PORT}`)
+        })
+
+        console.log('Connection has been established successfully.')
+    } catch (error) {
+        console.error('Unable to connect to the database:', error)
+    }
+}
+
+start()
