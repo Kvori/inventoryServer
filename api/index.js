@@ -1,12 +1,12 @@
 import express from 'express'
 import cors from 'cors'
-import sequelize from './db.js'
-import router from './routes/index.js'
-import ErrorHandler from './middleware/errorHandlingMiddleware.js'
+import sequelize from '../db.js'
+import router from '../routes/index.js'
+import ErrorHandler from '../middleware/errorHandlingMiddleware.js'
 import session from 'express-session'
 import SequelizeStore from 'connect-session-sequelize'
-import { Category } from './models/models.js'
-import { Category_Default } from './consts.js'
+import { Category } from '../models/models.js'
+import { Category_Default } from '../consts.js'
 
 const PORT = process.env.PORT || 5000
 const app = express()
