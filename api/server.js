@@ -43,19 +43,10 @@ app.use(express.json())
 app.use('/api', router)
 app.use(ErrorHandler)
 
-let initialized = false
-const initialize = async () => {
-  if (initialized) return
-  await sequelize.authenticate()
-  await sequelize.sync({ alter: true })
-  await store.sync()
-  await Category.bulkCreate(Category_Default, { ignoreDuplicates: true })
-  initialized = true
-}
+// Инициализация до экспорта
+await sequelize.authenticate()
+await sequelize.sync({ alter: true })
+await store.sync()
+await Category.bulkCreate(Category_Default, { ignoreDuplicates: true })
 
-const handler = async (req, res) => {
-  await initialize()
-  return serverless(app)(req, res)
-}
-
-export default handler
+export default serverless(app)
