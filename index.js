@@ -7,6 +7,7 @@ import session from 'express-session'
 import SequelizeStore from 'connect-session-sequelize'
 import initSocket from './ws/index.js'
 import http from 'http'
+import https from 'https'
 import { Category } from './models/models.js'
 import { Category_Default } from './consts.js'
 
@@ -28,7 +29,6 @@ app.use(session({
     resave: false,
     saveUninitialized: false,
     cookie: {
-        httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
         sameSite: 'none',
         secure: true
@@ -54,7 +54,7 @@ const start = async () => {
 
         await Category.bulkCreate(Category_Default, { ignoreDuplicates: true })
 
-        const server = http.createServer(app)
+        const server = https.createServer(app)
 
         initSocket(server)
 
