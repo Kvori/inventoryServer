@@ -1,9 +1,20 @@
-const authMiddleware = (req, res, next) => {
-    if (req.session?.user) {
-        req.user = req.session.user
+import jsonwebtoken from "jsonwebtoken"
+
+function authMiddleware(req, res, next) {
+    if (req.method === "OPTIONS") {
         next()
-    } else {
-        res.status(401).json({message: 'User is not authorized'})
+    }
+    try {
+        const token = req.headers.authorization.split(" ")[1]
+        if (!token) {
+            return res.status(401).json({message: "Пользователь не авторизован"})
+        }
+        const decoded = jsonwebtoken.verify(token, process.env.SECRET_KEY)
+
+        req.user = decoded
+        next()
+    } catch (e) {
+        res.status(401).json({message: "Пользователь не авторизован"})
     }
 }
 

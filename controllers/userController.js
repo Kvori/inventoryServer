@@ -1,6 +1,15 @@
 import ApiError from "../error/apiError.js"
 import bcrypt from 'bcrypt'
+import jsonwebtoken from "jsonwebtoken"
 import { User } from "../models/models.js"
+
+function generateJwt(id, email) {
+    return jsonwebtoken.sign(
+        { id, email },
+        process.env.SECRET_KEY,
+        { expiresIn: '24h' }
+    )
+}
 
 class UserController {
     async registration(req, res, next) {
@@ -10,59 +19,40 @@ class UserController {
                 return next(ApiError.badRequest('Некорретный email, имя или пароль'))
             }
 
-            const candidate = await User.findOne({ where: { email } })
-            if (candidate) {
+            const condidate = await User.findOne({ where: { email } })
+            if (condidate) {
                 return next(ApiError.badRequest('Пользователь с таким email уже существует'))
             }
 
             const hashPassword = await bcrypt.hash(password, 5)
             const user = await User.create({ email, name, password: hashPassword })
+            const token = generateJwt(user.id, user.email)
 
             await user.update({ last_login: new Date() })
-
-            req.session.user = {
-                id: user.id,
-                email: user.email,
-                name: user.name
-            }
-
-            req.session.save(() => {
-                return res.json(user)
-            })
+            return res.json({ token, user })
         } catch (e) {
             next(ApiError.internal('Ошибка регистрации'))
         }
     }
 
     async login(req, res, next) {
-        const { email, password } = req.body
-
         try {
+            const { email, password } = req.body
             const user = await User.findOne({ where: { email } })
             if (!user) {
-                return next(ApiError.badRequest('Пользователя не найден'))
+                return next(ApiError.badRequest('Пользователя с таким email не существует'))
             }
 
-            const comparePassword = bcrypt.compareSync(password, user.password)
+            let comparePassword = bcrypt.compareSync(password, user.password)
             if (!comparePassword) {
                 return next(ApiError.badRequest('Неверный пароль'))
             }
 
-            if (user.block_status === 1) {
-                return next(ApiError.forbidden('Пользователь заблокирован'))
-            }
+            if (user.block_status === 1) return next(ApiError.forbidden('Пользователь заблокирован'))
 
+            const token = generateJwt(user.id, user.email)
             await user.update({ last_login: new Date() })
-
-            req.session.user = {
-                id: user.id,
-                email: user.email,
-                name: user.name
-            }
-
-            req.session.save(() => {
-                return res.json(user)
-            })
+            return res.json({ token, user })
         } catch (e) {
             next(ApiError.internal('Ошибка входа'))
         }
@@ -70,56 +60,15 @@ class UserController {
 
     async check(req, res) {
         try {
-            const sessionUser = req.session?.user
+            const token = generateJwt(req.user.id, req.user.email)
+            const id = req.user.id
+            const user = await User.findOne({ where: { id }, attributes: ["id", "name", "email", "last_login", "block_status"] })
 
-            if (!sessionUser) {
-                return res.status(401).json({ message: "Сессия не найдена" })
-            }
-
-            const id = sessionUser.id
-            const user = await User.findOne({
-                where: { id },
-                attributes: ["id", "name", "email", "last_login", "block_status"]
-            })
-
-            if (!user) {
-                return res.status(404).json({ message: 'Пользователь не найден' })
-            }
-
-            await user.update({ last_login: new Date() })
-
-            req.session.user = {
-                id: user.id,
-                email: user.email,
-                name: user.name
-            }
-
-            return res.json(user)
+            await User.update({ last_login: new Date() }, { where: { id } })
+            return res.json({ token, user })
         } catch (e) {
             next(ApiError.internal('Ошибка при проверке сессии'))
         }
-    }
-
-    async logout(req, res, next) {
-        const session = req.session
-
-        if (!session) {
-            return res.status(401).json({ message: "Сессия не найдена" })
-        }
-
-        session.destroy(err => {
-            if (err) {
-                return next(ApiError.internal('Ошибка при выходе из системы'))
-            }
-
-            res.clearCookie('connect.sid', {
-                path: '/',
-                httpOnly: true,
-                sameSite: 'none',
-                secure: true
-            })
-            res.json({ message: 'Выход из системы прошел успешно' })
-        })
     }
 
     async block(req, res, next) {
