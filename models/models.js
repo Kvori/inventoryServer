@@ -63,15 +63,18 @@ export const Tag = sequelize.define('tag', {
     title: { type: DataTypes.STRING, unique: true }
 }, {
     timestamps: false
-}
-)
+})
 
 User.hasMany(Inventory)
-Inventory.belongsTo(User)
+Inventory.belongsTo(User, {
+    as: 'creator',
+    foreignKey: 'creatorId'
+})
+
+User.belongsToMany(Inventory, { through: "FavoriteInventory", as: 'favorites', timestamps: false });
+Inventory.belongsToMany(User, { through: "FavoriteInventory", as: 'favoritedBy', timestamps: false });
 
 Inventory.hasMany(Item)
-Item.belongsTo(Inventory)
-
 Item.belongsTo(User, {
     as: 'creator',
     foreignKey: 'creatorId'

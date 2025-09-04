@@ -2,11 +2,15 @@ import { Router } from "express";
 import inventoryController from "../controllers/inventory/inventoryController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 
-const inventoryRouter = new Router()
+const inventoryRouter = new Router();
 
-inventoryRouter.post('/create', authMiddleware, inventoryController.create)
-inventoryRouter.get('/user', authMiddleware, inventoryController.getAllByUser)
-inventoryRouter.get('/inventory', inventoryController.getOne)
-inventoryRouter.post('/save', authMiddleware, inventoryController.saveSettings)
+inventoryRouter.post('/', authMiddleware, inventoryController.create);
+inventoryRouter.delete('/', authMiddleware, inventoryController.deleteInventories);
+inventoryRouter.get('/user/:id', inventoryController.getAllCreated);
+inventoryRouter.get('/:id', inventoryController.getOne);
+inventoryRouter.put('/:id/settings', authMiddleware, inventoryController.saveSettings);
+inventoryRouter.put('/:id/favorite', authMiddleware, inventoryController.updateFavorite);
+inventoryRouter.get('/:id/favorite/status', authMiddleware, inventoryController.checkFavorite);
+inventoryRouter.get('/favorites/:userId', inventoryController.getFavoriteInventoriesByUser);
 
-export default inventoryRouter
+export default inventoryRouter;

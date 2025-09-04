@@ -12,7 +12,7 @@ class ItemController {
             )
         }
 
-        const user = req.session.user
+        const user = req.user
         const transaction = await sequelize.transaction()
 
         try {
@@ -106,7 +106,7 @@ class ItemController {
                         as: 'creator',
                         attributes: ['name']
                     }
-                ]   
+                ]
             })
 
             const formatted = items.map(item => ({
@@ -114,7 +114,7 @@ class ItemController {
                 creator: item.creator?.name || null,
                 createdAt: item.createdAt,
                 itemValues: item.itemValues
-              }))
+            }))
 
             return res.json(formatted)
         } catch (e) {
