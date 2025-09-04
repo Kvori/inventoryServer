@@ -8,13 +8,7 @@ class TagsController {
 
         const inventory = await Inventory.findOne({ where: { id: inventoryId } })
 
-        // const dataTags = await Tag.findAll({ where: { title: { [Op.in]: tags } } })
-
-        // res.json(dataTags)
         try {    
-            // const createdTags = await Promise.all(tags.map(tag =>
-            //     Tag.create({ title: tag })
-            // ))
             const createdTags = await Tag.bulkCreate(tags, {ignoreDuplicates: true})
             const setTags = Promise.all((createdTags).map(tag =>
                 inventory.setTags(tag)

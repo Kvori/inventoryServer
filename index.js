@@ -11,7 +11,7 @@ const app = express()
 
 app.use(cors({
     origin: 'https://inventoryserver-production-48b8.up.railway.app',
-    credentials: false, // JWT не требует credentials
+    credentials: false,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }))

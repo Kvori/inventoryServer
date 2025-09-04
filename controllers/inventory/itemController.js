@@ -1,6 +1,6 @@
 import sequelize from '../../db.js'
 import ApiError from '../../error/apiError.js'
-import { Item, ItemValue, Field, User } from '../../models/models.js'
+import { Item, ItemValue, User } from '../../models/models.js'
 
 class ItemController {
     async create(req, res, next) {
