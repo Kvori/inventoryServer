@@ -7,6 +7,7 @@ const inventoryRouter = new Router();
 inventoryRouter.post('/', authMiddleware, inventoryController.create);
 inventoryRouter.delete('/', authMiddleware, inventoryController.deleteInventories);
 inventoryRouter.get('/user/:id', inventoryController.getAllCreated);
+inventoryRouter.get('/available/:id', inventoryController.getAllAvailable);
 inventoryRouter.get('/:id', inventoryController.getOne);
 inventoryRouter.put('/:id/settings', authMiddleware, inventoryController.saveSettings);
 inventoryRouter.put('/:id/favorite', authMiddleware, inventoryController.updateFavorite);

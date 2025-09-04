@@ -100,6 +100,24 @@ class InventoryController {
         }
     }
 
+    async getAllAvailable(req, res, next) {
+        const userId = req.params.id;
+
+        try {
+            const inventories = await Inventory.findAll({
+                where: {
+                    creatorId: {
+                        [Op.ne]: userId
+                    }
+                }
+            });
+
+            return res.json(inventories);
+        } catch (e) {
+            return next(ApiError.internal('Failed to fetch inventories'));
+        }
+    }
+
     async saveSettings(req, res, next) {
         const inventoryId = req.params.id;
         const { inventoryData, tags } = req.body;
@@ -238,7 +256,7 @@ class InventoryController {
     }
 
     async getTop(req, res, next) {
-        const test = await Inventory.findAll({where: {}})
+        const test = await Inventory.findAll({ where: {} })
     }
 }
 
