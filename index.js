@@ -10,7 +10,6 @@ const PORT = process.env.PORT || 5000
 const app = express()
 
 app.use(cors({
-    origin: 'https://inventoryserver-production-48b8.up.railway.app',
     allowedHeaders: ['Content-Type', 'Authorization']
 }))
 app.use(express.json())
