@@ -27,6 +27,13 @@ class FieldController {
             return next(ApiError.badRequest('Missing type or inventoryId'));
         }
 
+        const fieldsTypeLimit = 3
+        const fieldsType = await Field.findAll({where: {inventoryId, type}})
+        
+        if (fieldsType.length >= fieldsTypeLimit) {
+            return next(ApiError.badRequest('Fields type limit exceeded'))
+        }
+
         try {
             const fieldsCount = await Field.count({ where: { inventoryId } });
             const newField = await Field.create({
@@ -57,6 +64,14 @@ class FieldController {
 
             if (!field) {
                 return next(ApiError.notFound('Field not found'));
+            }
+
+            const fieldsTypeLimit = 3
+            const fieldsType = await Field.findAll({where: {inventoryId, type: fieldData.type}})
+
+            
+            if (fieldsType.length >= fieldsTypeLimit) {
+                return next(ApiError.badRequest('Fields type limit exceeded'))
             }
 
             const updated = await field.update(fieldData);
